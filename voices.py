@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Барлық қолжетімді дауыстарды тексеру
+Check all available voices
 """
 
 import os
@@ -10,27 +10,27 @@ import time
 import argparse
 from pathlib import Path
 
-# Оқыңыз: API кілтіңізді осыда жазыңыз немесе GOOGLE_API_KEY айнымалысы арқылы беріңіз
+# Note: Write your API key here or provide it via the GOOGLE_API_KEY environment variable
 API_KEY = 'AIzaSyCL1hEMA3f0JeSIZnVqN_0YfbKMmBY77Ps'
 
-# Әдепкі шығыс бумасының атауы
+# Default output directory name
 DEFAULT_OUTPUT_DIR = "voice_example"
 
-# Тестілеуге арналған дауыстар тізімі (Тілдер/Сипаттамалар болжамды!)
-# Қолдау көрсетілмеуі мүмкін екенін ескеріңіз!
+# List of voices for testing (Languages/Descriptions are approximate!)
+# Note: Some voices may not be supported!
 VOICES_INFO = {
-    "Puck":    "Ер",
-    "Charon":  "Ер(жуан)",
-    "Kore":    "Әйел",
-    "Fenrir":  "Ер",
-    "Aoede":   "Әйел" 
+    "Puck":    "Male",
+    "Charon":  "Male (deep)",
+    "Kore":    "Female",
+    "Fenrir":  "Male",
+    "Aoede":   "Female" 
 }
 
-VOICES = list(VOICES_INFO.keys()) # Тексеру үшін тізім
+VOICES = list(VOICES_INFO.keys()) # List for checking
 
 def test_all_voices(api_key=None, text=None, output_dir=None):
     """
-    Барлық белгілі дауыстарды тексеру және сипаттамаларын көрсету
+    Test all known voices and display their descriptions
     """
     try:
         from gemini_tts import GeminiTTS
@@ -42,82 +42,82 @@ def test_all_voices(api_key=None, text=None, output_dir=None):
                 api_key = os.environ.get('GOOGLE_API_KEY')
             else:
                 raise ValueError(
-                    "API кілті берілмеді. test_voices.py файлында API_KEY айнымалысын өзгертіңіз, "
-                    "немесе --api_key параметрін қолданыңыз, "
-                    "немесе GOOGLE_API_KEY айнымалысын қоршаған ортада орнатыңыз."
+                    "API key not provided. Edit the API_KEY variable in test_voices.py, "
+                    "or use the --api_key parameter, "
+                    "or set the GOOGLE_API_KEY environment variable."
                 )
         
-        # Егер мәтін берілмесе, әдепкі мәтінді қолдану
+        # Use default text if not provided
         if not text:
-            text = "Сәлем! Менің атым {voice}, мен Gemini TTS кітапханасының бір дауысымын."
+            text = "Hello! My name is {voice}, I am one of the voices of the Gemini TTS library."
         
-        # Шығыс директориясын анықтау және құру
+        # Determine and create output directory
         if not output_dir:
             output_dir = DEFAULT_OUTPUT_DIR
         Path(output_dir).mkdir(parents=True, exist_ok=True)
-        print(f"Аудио файлдар '{output_dir}' бумасына сақталады.")
+        print(f"Audio files will be saved to the '{output_dir}' directory.")
         
-        print("*** Ескерту: Тілдер туралы ақпарат API арқылы алынбаған, тек болжам!")
-        print("*** Толық ақпаратты Google Gemini/Vertex AI құжаттамасынан қараңыз.")
+        print("*** Note: Language information is not retrieved from the API, only an estimate!")
+        print("*** For full details, see the Google Gemini/Vertex AI documentation.")
         
-        # TTS клиентін жасау
+        # Create TTS client
         client = GeminiTTS(api_key=api_key)
         
-        # Әр дауысты тексеру
+        # Test each voice
         for voice in VOICES:
-            # Дауыс сипаттамасын алу
-            voice_desc = VOICES_INFO.get(voice, "Белгісіз сипаттама")
+            # Get voice description
+            voice_desc = VOICES_INFO.get(voice, "Unknown description")
             
-            # Файл атауын жасау (бума ішінде)
+            # Create file name (inside directory)
             file_name = f"voice_{voice.lower()}.wav"
             file_path = f"voice_example/{file_name}"
             
-            # Мәтінді дайындау
+            # Prepare text
             voice_text = text.format(voice=voice)
             
-            print(f"\nДауыс тексеру: {voice} ({voice_desc})")
-            print(f"Мәтін: {voice_text}")
-            print(f"Файл: {file_path}")
+            print(f"\nTesting voice: {voice} ({voice_desc})")
+            print(f"Text: {voice_text}")
+            print(f"File: {file_path}")
             
-            # Мәтінді дауысқа айналдыру
+            # Convert text to speech
             try:
-                result = client.say(voice_text, output_file=file_path, voice=voice, play_audio=False) # Тест кезінде ойнатпау
-                print(f"Нәтиже: {result}")
+                result = client.say(voice_text, output_file=file_path, voice=voice, play_audio=False) # Do not play during test
+                print(f"Result: {result}")
             except Exception as e:
-                 # Егер дауыс қолжетімсіз болса, қатені басып шығарып, жалғастыру
-                 print(f"!!! Қате ({voice}): {str(e)}")
+                 # If the voice is unavailable, print the error and continue
+                 print(f"!!! Error ({voice}): {str(e)}")
                  if "is not available for model" in str(e):
-                      print(f"--- '{voice}' дауысы өткізіліп жіберілді.")
-                      continue # Келесі дауысқа өту
+                      print(f"--- Voice '{voice}' skipped.")
+                      continue # Go to next voice
                  else:
-                      # Басқа қате болса, толық ақпаратты көрсету
+                      # For other errors, show full info
                       import traceback
                       traceback.print_exc()
-                      # Мүмкін, мұнда тоқтаған дұрыс шығар, бірақ қазір жалғастырамыз
+                      # Maybe better to stop here, but for now continue
             
-            print(f"Күте тұрыңыз...")
-            time.sleep(1) # Кішкене күту
+            print(f"Please wait...")
+            time.sleep(1) # Small wait
             
-        print("\nБарлық қолжетімді дауыстар тексерілді!")
+        print("\nAll available voices have been tested!")
         return True
         
     except ImportError:
-         print("Қате: 'gemini_tts' кітапханасы табылмады. Орнату: pip install -e .")
+         print("Error: 'gemini_tts' library not found. Install with: pip install -e .")
          return False
     except ValueError as ve:
-         print(f"API кілті қатесі: {ve}")
+         print(f"API key error: {ve}")
          return False
     except Exception as e:
-        print(f"Күтпеген жалпы қате: {str(e)}")
+        print(f"Unexpected general error: {str(e)}")
         import traceback
         traceback.print_exc()
         return False
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Gemini TTS дауыстарын тексеру")
-    parser.add_argument("--api_key", help="Google Gemini API кілті (егер файлда немесе ENV-да көрсетілмесе)")
-    parser.add_argument("--text", help="Сөйлеуге айналдыру үшін мәтін шаблоны (міндетті емес)")
-    parser.add_argument("--output_dir", help=f"Аудио файлдарды сақтау үшін директория (әдепкі: {DEFAULT_OUTPUT_DIR})")
+    parser = argparse.ArgumentParser(description="Test Gemini TTS voices")
+    parser.add_argument("--api_key", help="Google Gemini API key (if not specified in file or ENV)")
+    parser.add_argument("--text", help="Text template to convert to speech (optional)")
+    parser.add_argument("--output_dir", help=f"Directory to save audio files (default: {DEFAULT_OUTPUT_DIR})")
     
     args = parser.parse_args()
     

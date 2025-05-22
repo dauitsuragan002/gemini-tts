@@ -2,30 +2,30 @@
 # -*- coding: utf-8 -*-
 
 """
-Ең қарапайым тест - бір жолмен TTS тексеру
+The simplest test - check TTS with a single line
 """
 
-# Оқыңыз: API кілтіңізді осында жазыңыз
+# Note: Write your API key here
 API_KEY = "AIzaSyCL1hEMA3f0JeSIZnVqN_0YfbKMmBY77Ps"
 
-# Әдепкі мәтін - мұны өзгертуге болады
-TEXT = "Сәлем қалайсың?"
+# Default text - you can change this
+TEXT = "Hello, how are you?"
 
-# Дауыс түрі - Puck (әйел), Kore (ер)
-VOICE = "Kore"  # Ер дауысы
+# Voice type - Puck (female), Kore (male)
+VOICE = "Kore"  # Male voice
 
 try:
-    # Gemini TTS кітапханасын импорттау
+    # Import Gemini TTS library
     from gemini_tts import say, GeminiTTS
     
-    # GeminiTTS объектісін тікелей пайдалану
+    # Use GeminiTTS object directly
     client = GeminiTTS(api_key=API_KEY or None, default_voice=VOICE)
     
-    # Мәтінді сөйлеуге айналдыру
+    # Convert text to speech
     result = client.say(TEXT, output_file="test_output.wav")
-    print(f"Аудио сақталған жол: {result}")
+    print(f"Audio saved to: {result}")
     
 except Exception as e:
-    print(f"Қате орын алды: {str(e)}")
+    print(f"An error occurred: {str(e)}")
     import traceback
     traceback.print_exc() 
