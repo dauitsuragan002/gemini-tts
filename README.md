@@ -1,107 +1,109 @@
-# Gemini TTS (немесе Gemini Parrot TTS) - Қарапайым мәтіннен сөйлеуге айналдыру кітапханасы
+# Gemini TTS (or Gemini Parrot TTS) - Simple Text-to-Speech Library
 
-Бұл кітапхана Google Gemini API арқылы мәтінді сөйлеуге айналдыруға арналған **креативті шешім**. Ол Gemini моделін тек берілген мәтінді қайталауға ("тотықұс" режимі) бағыттауға тырысады, бірақ модельдің сұхбаттасуға бейімділігіне байланысты бұл әрдайым толық орындалмауы мүмкін.
+This library is a **creative solution** for text-to-speech conversion using the Google Gemini API. It attempts to guide the Gemini model into a "parrot mode" (repeating the given text exactly), but due to the model's conversational nature, this might not always be fully successful.
 
-## Орнату (Installation)
+## Installation
 
-### Pip арқылы орнату (болашақта)
+### Install via Pip (Future)
 ```bash
-# Негізгі функционалдылық
+# Basic functionality
 pip install gemini-tts
 
-# Аудио ойнату қолдауымен (ұсынылады)
+# With audio playback support (recommended)
 pip install gemini-tts[audio]
 ```
 
-### Кодтан орнату
+### Install from Source
 ```bash
 git clone https://github.com/dauitsuragan002/gemini-tts.git
 cd gemini-tts
 pip install -e .
-# Аудио ойнату үшін
+# For audio playback
 pip install -e .[audio]
 ```
 
-## Қажетті компоненттер
+## Requirements
 - Python 3.7+
 - websockets
 - wave
-- pygame (опционалды, аудио ойнату үшін)
+- pygame (optional, for audio playback)
 
-## Қолдану (Usage)
+## Usage
 
-### 1. Класс арқылы қолдану (ұсынылған әдіс)
+### 1. Using the Class (Recommended Method)
 ```python
 from gemini_tts import GeminiTTS
 
-# Клиент жасау
+# Create a client
 client = GeminiTTS(api_key="your_api_key_here", default_voice="Puck")
 
-# Сөйлеуге айналдыру және аудио файлын сақтау
-client.say("Бұл класс арқылы жасалған мысал")
+# Convert to speech and save the audio file
+client.say("This is an example using the class")
 
-# Дауыс түрін өзгерту
-client.say("Бұл басқа дауыс", voice="Kore")
+# Change the voice
+client.say("This is a different voice", voice="Kore")
 
-# Аудионы ойнатпау
-client.say("Тек файлға сақтау", play_audio=False)
+# Don't play the audio
+client.say("Only save to file", play_audio=False)
 ```
 
-### 3. Аудионы тікелей ойнату
+### 3. Direct Audio Playback
 ```python
 from gemini_tts import GeminiTTS
 
 client = GeminiTTS(api_key="your_api_key_here")
 
-# Мәтінді сөйлеуге айналдыру және бірден ойнату
-client.say("Бұл дыбыс автоматты түрде ойнатылады", play_audio=True)
+# Convert text to speech and play immediately
+client.say("This audio will play automatically", play_audio=True)
 ```
 
-### 4. Синхронды түрде файл генерациялау (ойнатпау)
+### 4. Synchronous File Generation (No Playback)
 ```python
 from gemini_tts import GeminiTTS
 
 client = GeminiTTS(api_key="your_api_key_here")
 
-# Мәтінді сөйлеуге айналдыру, бірақ ойнатпау
-file_path = client.text_to_speech("Бұл тек файлға сақталады", output_file="sync_output.wav")
-print(f"Аудио файл синхронды түрде сақталды: {file_path}")
+# Convert text to speech, but don't play
+file_path = client.text_to_speech("This will only be saved to a file", output_file="sync_output.wav")
+print(f"Audio file saved synchronously: {file_path}")
 ```
 
-**Ескерту:** Gemini TTS (кейде "Gemini Parrot TTS" деп те атауға болады) арқылы төмендегі дауыстар әрдайым дәлме-дәл дыбысталмауы мүмкін. Себебі, бұл кітапхана Gemini моделін тек мәтінді қайталауға ("тотықұс" режимі) "мәжбүрлеуге" тырысады, бірақ модель кейде бәрібір сұхбаттасуға көшіп, енгізілген мәтінге жауап беруі ықтимал. Бұл – осы креативті әдістің белгілі бір шектеуі.
+**Note:** Voices synthesized via Gemini TTS (sometimes called "Gemini Parrot TTS") might not always be perfectly accurate renditions of the input text. This is because the library attempts to "force" the Gemini model into a "parrot mode" (only repeating), but the model may still sometimes shift into a conversational mode and respond to the input text instead. This is a known limitation of this creative approach.
 
-## Толық мысалдар
+## Full Examples
 
-- `example.py` - негізгі функцияларды көрсетеді
-- `/voice_example` - әр түрлі дауыспен аудиоға түрлендірген аудиолар 
+- `example.py` - shows basic functions
+- `/voice_example` - contains audio files converted with different voices
 
-## Дауыс түрлері
-Gemini API ұсынатын кейбір дауыс түрлері:
-- **Ерлер дауыстары:**
-  - Charon (жуан)
-  - Puck
-  - Fenrir
-- **Әйелдер дауыстары:**
-  - Kore
-  - Aoede
+## Voice Types
+Available voices tested (may vary based on model compatibility):
+- **Male Voices:**
+  - Puck (Male)
+  - Charon (Male, Deep)
+  - Fenrir (Male)
+- **Female Voices:**
+  - Kore (Female)
+  - Aoede (Female)
 
-## Нұсқа тарихы
+**Note:** This list might not be exhaustive, and some voices (e.g., Bassett) might be incompatible with the `gemini-2.0-flash-exp` model. Check the official Gemini API documentation.
+
+## Version History
 
 ### v0.1.1
-- Тікелей аудио ойнату қосылды
-- Дауыс параметрлерін оңтайландыру (жуан ерлер дауыстары үшін)
-- Дауыстарды категориялар бойынша ұйымдастыру
-- Тотықұс ЖИ
+- Added direct audio playback
+- Optimized voice parameters (for deep male voices)
+- Organized voices by category
+- Parrot AI
 
 ### v0.1.0
-- Алғашқы нұсқа
+- Initial release
 
-## Авторлар
-- Әзірлеуші: David Suragan
-- AI көмекші: Claude (Anthropic)
+## Authors
+- Developer: David Suragan
+- AI Assistant: Claude (Anthropic) & Gemini (Google)
 
-## Алғыс білдіру
-Бұл жоба [agituts/gemini-2-tts](https://github.com/agituts/gemini-2-tts) репозиторийінен шабыт алды. Осы жобаның авторына шексіз алғысымызды білдіреміз.
+## Acknowledgments
+This project was inspired by the [agituts/gemini-2-tts](https://github.com/agituts/gemini-2-tts) repository. Many thanks to the author of that project.
 
-## Лицензия
-MIT
+## License
+MIT  
